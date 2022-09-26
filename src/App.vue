@@ -38,9 +38,31 @@ export default defineComponent({
         this.activeEmail = null;
       }
     },
+    keyEvents(event: KeyboardEvent) {
+      if (event.key === "Escape") {
+        this.activeEmail = null;
+      }
+      if (event.key === "r") {
+        if (this.activeEmail != null)
+          this.emailStore.readEmail(this.activeEmail);
+        else this.emailStore.readEmails(this.selected);
+      }
+
+      if (event.key === "u") {
+        if (this.activeEmail != null)
+          this.emailStore.archiveEmail(this.activeEmail);
+        else this.emailStore.unarchiveEmails(this.selected);
+      }
+    },
   },
   computed: {
     ...mapStores(useEmailStore),
+  },
+  mounted() {
+    document.addEventListener("keydown", this.keyEvents);
+  },
+  beforeUnmount() {
+    document.removeEventListener("keydown", this.keyEvents);
   },
 });
 </script>
@@ -49,8 +71,12 @@ export default defineComponent({
   <div class="main">
     <aside class="aside">
       <div class="aside--top">
-        <TheButton @click="changeTab('inbox')"> Inbox</TheButton>
-        <TheButton @click="changeTab('archive')"> Archived</TheButton>
+        <TheButton @click="changeTab('inbox')">
+          Inbox ({{ emailStore.inbox.length }})</TheButton
+        >
+        <TheButton @click="changeTab('archive')">
+          Archived ({{ emailStore.archived.length }})
+        </TheButton>
       </div>
       <div class="aside-bottom">
         <TheButton> Logout</TheButton>
@@ -59,7 +85,7 @@ export default defineComponent({
     <section class="inbox" v-if="active === 'inbox'">
       <header>
         <h5>{{ active }}</h5>
-        <h1>Email Selected ({{ emailStore.inbox.length }})</h1>
+        <h1>Email Selected ({{ selected.length }})</h1>
       </header>
       <main>
         <div>
@@ -74,7 +100,6 @@ export default defineComponent({
         <div>
           <div
             class="email"
-            @click="activeEmail = email.id"
             :class="{ email__read: email.read }"
             v-for="email in emailStore.inbox"
             :key="email.id"
@@ -86,7 +111,9 @@ export default defineComponent({
               v-model="selected"
               :value="email.id"
             />
-            <h2 class="email--title">{{ email.title }}</h2>
+            <h2 @click="activeEmail = email.id" class="email--title">
+              {{ email.title }}
+            </h2>
           </div>
         </div>
       </main>
@@ -94,7 +121,7 @@ export default defineComponent({
     <section class="archive" v-else>
       <header>
         <h5>{{ active }}</h5>
-        <h1>Email Selected ({{ emailStore.archived.length }})</h1>
+        <h1>Email Selected ({{ selected.length }})</h1>
       </header>
       <main>
         <div>
@@ -106,7 +133,6 @@ export default defineComponent({
         <div>
           <div
             class="email"
-            @click="activeEmail = email.id"
             :class="{ email__read: email.read }"
             v-for="email in emailStore.archived"
             :key="email.id"
@@ -118,7 +144,9 @@ export default defineComponent({
               v-model="selected"
               :value="email.id"
             />
-            <h2 class="email--title">{{ email.title }}</h2>
+            <h2 @click="activeEmail = email.id" class="email--title">
+              {{ email.title }}
+            </h2>
           </div>
         </div>
       </main>
@@ -191,7 +219,7 @@ export default defineComponent({
     flex-direction: column;
     .email {
       display: flex;
-      padding: 0.4rem 1rem;
+      padding: 0 1rem;
       background-color: #cccccc;
       margin-bottom: 0.5rem;
       margin-top: 0.5rem;
@@ -199,7 +227,7 @@ export default defineComponent({
       border: 1px solid #f4f0f9;
 
       &__read {
-        opacity: 0.3;
+        opacity: 0.5;
       }
 
       &--checkbox {
@@ -208,6 +236,8 @@ export default defineComponent({
       &--title {
         margin: 0;
         font-size: 1.1rem;
+        padding: 0.4rem 0;
+        width: 100%;
       }
     }
   }
