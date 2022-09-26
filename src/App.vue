@@ -15,6 +15,7 @@ export default defineComponent({
       checked: false,
       selectAll: false,
       selected: [] as number[],
+      activeEmail: null as number | null,
     };
   },
   watch: {
@@ -28,6 +29,14 @@ export default defineComponent({
       if (this.active === tab) return;
       this.active = tab;
       this.selected = [];
+    },
+    clickOutside(event: MouseEvent) {
+      if (
+        event.target != null &&
+        (event.target as HTMLElement).classList.contains("email-view")
+      ) {
+        this.activeEmail = null;
+      }
     },
   },
   computed: {
@@ -65,6 +74,7 @@ export default defineComponent({
         <div>
           <div
             class="email"
+            @click="activeEmail = email.id"
             :class="{ email__read: email.read }"
             v-for="email in emailStore.inbox"
             :key="email.id"
@@ -96,6 +106,7 @@ export default defineComponent({
         <div>
           <div
             class="email"
+            @click="activeEmail = email.id"
             :class="{ email__read: email.read }"
             v-for="email in emailStore.archived"
             :key="email.id"
@@ -112,6 +123,40 @@ export default defineComponent({
         </div>
       </main>
     </section>
+
+    <div class="email-view" v-if="activeEmail != null" @click="clickOutside">
+      <div class="email-view--details">
+        <div class="email-view--head">
+          <div>
+            <TheButton
+              appearance="text"
+              @click="activeEmail = null"
+              style="margin-bottom: 1rem"
+              >Escape (ESC)
+            </TheButton>
+            <br />
+            <TheButton
+              @click="activeEmail && emailStore.readEmail(activeEmail)"
+              style="margin-right: 1rem"
+              >Mark as Read (r)
+            </TheButton>
+            <TheButton
+              @click="activeEmail && emailStore.archiveEmail(activeEmail)"
+              >Archive (a)</TheButton
+            >
+          </div>
+        </div>
+
+        <h2>
+          {{
+            emailStore.email.find((email) => email.id === activeEmail)?.title
+          }}
+        </h2>
+        <p>
+          {{ emailStore.email.find((email) => email.id === activeEmail)?.body }}
+        </p>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -164,6 +209,25 @@ export default defineComponent({
         margin: 0;
         font-size: 1.1rem;
       }
+    }
+  }
+
+  .email-view {
+    position: absolute;
+    width: 100vw;
+    height: 100vh;
+    right: 0%;
+    background: rgba(0, 0, 0, 0.5);
+
+    &--details {
+      background: white;
+      padding: 1rem;
+      border-radius: 5px;
+      width: 60vw;
+      height: 100%;
+      position: absolute;
+      right: 0%;
+      overflow: auto;
     }
   }
 }
