@@ -11,7 +11,7 @@ export default defineComponent({
 
   data() {
     return {
-      active: "",
+      active: "Inbox",
       checked: false,
       selectAll: false,
       selected: [] as number[],
@@ -71,10 +71,10 @@ export default defineComponent({
   <div class="main">
     <aside class="aside">
       <div class="aside--top">
-        <TheButton @click="changeTab('inbox')">
+        <TheButton @click="changeTab('Inbox')">
           Inbox ({{ emailStore.inbox.length }})</TheButton
         >
-        <TheButton @click="changeTab('archive')">
+        <TheButton @click="changeTab('Archive')">
           Archived ({{ emailStore.archived.length }})
         </TheButton>
       </div>
@@ -82,7 +82,8 @@ export default defineComponent({
         <TheButton> Logout</TheButton>
       </div>
     </aside>
-    <section class="inbox" v-if="active === 'inbox'">
+    <!-- inbox -->
+    <section class="inbox" v-if="active === 'Inbox'">
       <header>
         <h5>{{ active }}</h5>
         <h1>Email Selected ({{ selected.length }})</h1>
@@ -93,7 +94,8 @@ export default defineComponent({
           <TheButton @click="emailStore.readEmails(selected)"
             >Mark as Read (r)
           </TheButton>
-          <TheButton @click="emailStore.archiveEmails(selected)"
+          <TheButton
+            @click="emailStore.archiveEmails(selected) && (selected = [])"
             >Archive (a)</TheButton
           >
         </div>
@@ -118,6 +120,7 @@ export default defineComponent({
         </div>
       </main>
     </section>
+    <!-- archive -->
     <section class="archive" v-else>
       <header>
         <h5>{{ active }}</h5>
@@ -151,7 +154,7 @@ export default defineComponent({
         </div>
       </main>
     </section>
-
+    <!-- email view -->
     <div class="email-view" v-if="activeEmail != null" @click="clickOutside">
       <div class="email-view--details">
         <div class="email-view--head">
@@ -217,14 +220,22 @@ export default defineComponent({
     display: flex;
     padding-left: 1rem;
     flex-direction: column;
+
+    .button {
+      &__filled {
+        margin-left: 1rem;
+      }
+    }
+
     .email {
       display: flex;
       padding: 0 1rem;
-      background-color: #cccccc;
+      background-color: #e9ecef;
       margin-bottom: 0.5rem;
+      margin-right: 0.5rem;
       margin-top: 0.5rem;
       border-radius: 5px;
-      border: 1px solid #f4f0f9;
+      border: 1px solid #ced4da;
 
       &__read {
         opacity: 0.5;
@@ -248,6 +259,12 @@ export default defineComponent({
     height: 100vh;
     right: 0%;
     background: rgba(0, 0, 0, 0.5);
+
+    &__head {
+      .button__filled {
+        margin-right: 0.5rem;
+      }
+    }
 
     &--details {
       background: white;

@@ -31,9 +31,9 @@ button {
 .button {
   &__filled {
     padding: 0.5rem 1rem;
-    border: 1px solid #ccc;
+    border: 1px solid #ced4da;
     border-radius: 2px;
-    background: #f4f8f9;
+    background: #f8f9fa;
   }
   &__text {
     padding: 0.5rem 1rem;

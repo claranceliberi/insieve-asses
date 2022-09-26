@@ -54,6 +54,7 @@ export const useEmailStore = defineStore("email", {
     },
     archiveEmails(ids: number[]) {
       ids.forEach((id) => this.archiveEmail(id));
+      return true;
     },
     unarchiveEmail(id: number) {
       const email = this.email.find((email) => email.id === id);
