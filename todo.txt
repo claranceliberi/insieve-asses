@@ -1,0 +1,18 @@
+components
+    - atoms
+        - select
+        - button
+    - molecules
+        - mail-card
+
+
+schema
+    Email
+        - id
+        - read_status
+        - title 
+        - body
+
+store
+    - inbox
+    - archived
